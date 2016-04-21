@@ -17,7 +17,8 @@ def chat_message(msg):
     ws.send('5:::{"name":"message","args":[{"method":"chatMsg","params":{"channel":"' + channel_name + '","name":"WcaleNieKrysztal", "nameColor":"' + random.choice(colors) + '","text":"' + msg + '"}}]}')
 
 url = 'https://api.hitbox.tv/'
-login_data = {'login': 'WcaleNieKrysztal', 'pass': 'dupa1234', 'rememberme': 'true'}
+# pass_temp = raw_input('Enter password: ')
+login_data = {'login': 'WcaleNieKrysztal', 'pass': raw_input('Enter password: '), 'rememberme': 'true'}
 
 
 r = requests.post(url + 'auth/token', data=json.dumps(login_data))
