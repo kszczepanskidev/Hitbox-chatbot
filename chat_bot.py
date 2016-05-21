@@ -1,12 +1,12 @@
-import requests
 import _thread
-import json
-import time, os
-import random
+import os
 import getpass
-from websocket import create_connection
+import codecs
 
 import dubtrack_api
+import hitbox_api
+
+__author__ = 'Krysztal'
 
 class ChatBot:
     url = 'https://api.hitbox.tv/'
@@ -14,20 +14,26 @@ class ChatBot:
     login = ''
     password = ''
     channel_name = ''
+    test = 1
 
     current_song_name = ''
     previous_song_name = ''
+
+    hitbox_api = None
 
     def __init__(self):
         if os.path.isfile('settings.data'):
             self.load_settings_from_file()
         else:
             self.prompt_user_settings()
-        os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
-        _thread.start_new_thread(self.save_dubtrack_name_to_file, ())
+        self.hitbox_api = hitbox_api.HitboxAPI(self)
 
+        os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
         os.system('cls')
-        print("Welcome to huntaBot by Kryształ\t\t\tv0.2 pre-alpha\n")
+        print("Welcome to huntaBot by Kryształ\t\tv0.2 pre-alpha\n")
+
+        _thread.start_new_thread(dubtrack_api.save_dubtrack_name_to_file, (self,))
+        _thread.start_new_thread(self.hitbox_api.hitbox_chat_receiver, ())
 
     def save_settings_to_file(self):
         with open('settings.data', 'w') as f:
@@ -37,9 +43,9 @@ class ChatBot:
 
     def load_settings_from_file(self):
         with open('settings.data', 'r') as f:
-            self.login = f.readline()
-            self.password = f.readline()
-            self.channel_name = f.readline()
+            self.login = f.readline().replace('\n', '')
+            self.password = f.readline().replace('\n', '')
+            self.channel_name = f.readline().replace('\n', '')
 
     def prompt_user_settings(self):
         self.login = input('Login: ')
@@ -47,18 +53,6 @@ class ChatBot:
         self.channel_name = input('Channel: ')
         self.save_settings_to_file()
 
-    def get_dubtrack_song_name(self):
-        self.current_song_name = dubtrack_api.get_current_song_name()
-        if not self.current_song_name == self.previous_song_name:
-            print('#' + self.current_song_name)
-            self.previous_song_name = self.current_song_name
-
-    def save_dubtrack_name_to_file(self):
-        while True:
-            self.get_dubtrack_song_name()
-            with open('dubtracksong.txt', 'w') as f:
-                print(self.current_song_name, file=f)
-            time.sleep(1)
 
 if __name__ == '__main__':
     bot = ChatBot()

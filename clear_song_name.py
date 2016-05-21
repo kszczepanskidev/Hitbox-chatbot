@@ -1,5 +1,6 @@
 def clear_song_name(song):
     song = song.replace('&apos;', '\'')
+    song = song.replace('&amp;', '&')
     song = song.replace('- Lyrics', '')
 
     song = song.replace('[OFFICIAL]', '')
