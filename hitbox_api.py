@@ -1,7 +1,6 @@
 import requests
 import json
 import random
-import _thread
 from websocket import create_connection
 
 __author__ = 'Krysztal'
@@ -23,7 +22,6 @@ class HitboxAPI:
     def hitbox_login(self):
         request = requests.post(self.chat_bot.url + 'auth/token', data=json.dumps(
             {'login': self.chat_bot.login, 'pass': self.chat_bot.password, 'rememberme': 'true'}))
-        print(request.text)
         self.user_token = request.text.split("\"")[3]
 
     def connect_websocket(self):
@@ -45,11 +43,12 @@ class HitboxAPI:
                                 '{{"channel":"{}","name":"{}","nameColor":"FF0000","text":"{}"}}}}]}}'
                                 .format(self.chat_bot.channel_name, self.chat_bot.login, msg))
         except:
-            # print('EXCEPTION')
+            print('EXCEPTION - Could not send message, attempting to reset connection')
             self.connect_websocket()
             self.chat_bot.previous_song_name = ''
 
     def hitbox_chat_receiver(self):
+        self.chat_message("Huntwieczór wszystkim! {}".format(random.randint(0, 100)))
         while True:
             self.handle_message(self.websocket.recv())
 
@@ -59,14 +58,39 @@ class HitboxAPI:
         elif message[0] == '2':
             self.websocket.send(message)
         else:
-            message_type = json.loads(message[4:].replace('["', '[').replace('"]', ']').replace('\\"', "\""))
-            message_type = message_type['args'][0]['method']
-            print(message_type)
-            pass
+            message = message[4:].replace('["', '[').replace('"]', ']').replace('\\"', "\"")
+            message = json.loads(message)
+            message_type = message['args'][0]['method']
+
+            if 'buffer' in message['args'][0]['params']:
+                return
+            if message_type == 'chatMsg':
+                self.handle_user_message(message['args'][0]['params'])
+            elif message_type == 'directMsg':
+                self.handle_direct_message(message['args'][0]['params'])
 
     def handle_user_message(self, msg):
-        pass
+        message_text = msg['text']
+        user_name = msg['name']
+        is_subscriber = msg['isSubscriber']
 
+        if user_name == "HuntaBot":
+            return
 
-#Characters to fix
-# ąę (probably all polish characters)
+        print("[CHAT]{}: {}".format(user_name, message_text))
+        if message_text[0] == "!":
+            self.handle_chat_command(message_text[1:], user_name, is_subscriber)
+
+    def handle_chat_command(self, msg, user, sub):
+        if msg == 'dubtrack':
+            if self.chat_bot.current_song_name != "":
+                self.chat_message('@{} teraz gra {}'.format(user, self.chat_bot.current_song_name))
+            else:
+                self.chat_message('@{} aktualnie na dubtracku nie leci żadna piosenka.'.format(user))
+
+    def handle_direct_message(self, msg):
+        message_text = msg['text']
+        user_name = msg['from']
+        channel = msg['channel']
+
+        self.chat_message('@{} {}'.format(channel, message_text))

@@ -1,7 +1,7 @@
 import _thread
 import os
 import getpass
-import codecs
+import time
 
 import dubtrack_api
 import hitbox_api
@@ -26,9 +26,12 @@ class ChatBot:
             self.load_settings_from_file()
         else:
             self.prompt_user_settings()
+
         self.hitbox_api = hitbox_api.HitboxAPI(self)
+        time.sleep(3)
 
         os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
+        # os.system('chcp 65001')
         os.system('cls')
         print("Welcome to huntaBot by Kryształ\t\tv0.2 pre-alpha\n")
 
@@ -49,7 +52,7 @@ class ChatBot:
 
     def prompt_user_settings(self):
         self.login = input('Login: ')
-        self.password = input('Password: : ')   # getpass.getpass('Password: ')
+        self.password = input('Password: ')   # getpass.getpass('Password: ')
         self.channel_name = input('Channel: ')
         self.save_settings_to_file()
 

@@ -20,8 +20,9 @@ def get_current_song_name():
 
 def get_dubtrack_song_name(chat_bot):
     chat_bot.current_song_name = get_current_song_name()
-    if not chat_bot.current_song_name == chat_bot.previous_song_name:
+    if not chat_bot.current_song_name == chat_bot.previous_song_name and chat_bot.current_song_name != "":
         print('{} {}'.format(chr(9835), chat_bot.current_song_name))
+        chat_bot.hitbox_api.chat_message("{}Na dubtracku gra {}".format(chr(9835),chat_bot.current_song_name))
         chat_bot.previous_song_name = chat_bot.current_song_name
 
 
