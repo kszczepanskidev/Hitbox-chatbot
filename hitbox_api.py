@@ -48,7 +48,8 @@ class HitboxAPI:
             self.chat_bot.previous_song_name = ''
 
     def hitbox_chat_receiver(self):
-        self.chat_message("Huntwieczór wszystkim! {}".format(random.randint(0, 100)))
+        # self.chat_message("Avoiding hitbox spam security {}".format(random.randint(0, 100)))
+        self.chat_message("Huntwieczór wszystkim!")
         while True:
             self.handle_message(self.websocket.recv())
 
