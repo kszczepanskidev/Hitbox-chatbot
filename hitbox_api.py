@@ -1,6 +1,8 @@
 import requests
 import json
 import random
+import threading
+from datetime import datetime
 from websocket import create_connection
 
 __author__ = 'Krysztal'
@@ -22,7 +24,7 @@ class HitboxAPI:
     def hitbox_login(self):
         request = requests.post(self.chat_bot.url + 'auth/token', data=json.dumps(
             {'login': self.chat_bot.login, 'pass': self.chat_bot.password, 'rememberme': 'true'}))
-        self.user_token = request.text.split("\"")[3]
+        self.user_token = request.text.split('\"')[3]
 
     def connect_websocket(self):
         chat_servers = json.loads(requests.get(self.chat_bot.url + 'chat/servers').text)
@@ -48,8 +50,8 @@ class HitboxAPI:
             self.chat_bot.previous_song_name = ''
 
     def hitbox_chat_receiver(self):
-        # self.chat_message("Avoiding hitbox spam security {}".format(random.randint(0, 100)))
-        self.chat_message("Huntwieczór wszystkim!")
+        # self.chat_message('Avoiding hitbox spam security {}'.format(random.randint(0, 100)))
+        self.chat_message('Huntwieczór wszystkim! :D /')
         while True:
             self.handle_message(self.websocket.recv())
 
@@ -59,7 +61,8 @@ class HitboxAPI:
         elif message[0] == '2':
             self.websocket.send(message)
         else:
-            message = message[4:].replace('["', '[').replace('"]', ']').replace('\\"', "\"")
+            self.log_messages(message)
+            message = message[4:].replace('["', '[').replace('"]', ']').replace('\\"', '\"')
             message = json.loads(message)
             message_type = message['args'][0]['method']
 
@@ -75,19 +78,21 @@ class HitboxAPI:
         user_name = msg['name']
         is_subscriber = msg['isSubscriber']
 
-        if user_name == "HuntaBot":
+        if user_name == 'HuntaBot':
             return
 
-        print("[CHAT]{}: {}".format(user_name, message_text))
-        if message_text[0] == "!":
+        print('[CHAT]{}: {}'.format(user_name, message_text))
+        if message_text[0] == '!':
             self.handle_chat_command(message_text[1:], user_name, is_subscriber)
 
     def handle_chat_command(self, msg, user, sub):
         if msg == 'dubtrack':
-            if self.chat_bot.current_song_name != "":
+            if self.chat_bot.current_song_name != '':
                 self.chat_message('@{} teraz gra {}'.format(user, self.chat_bot.current_song_name))
             else:
                 self.chat_message('@{} aktualnie na dubtracku nie leci żadna piosenka.'.format(user))
+        elif msg == 'komendy':
+            self.chat_message('Aktualnie dostępne komendy: dubtrack')
 
     def handle_direct_message(self, msg):
         message_text = msg['text']
@@ -95,3 +100,12 @@ class HitboxAPI:
         channel = msg['channel']
 
         self.chat_message('@{} {}'.format(channel, message_text))
+
+    def message_repeater(self):
+        threading.Timer(120, self.message_repeater).start()
+        self.chat_message(self.chat_bot.repeatable_message)
+
+    def log_messages(self, msg):
+        now = datetime.now()
+        with open('log_{}_{}_{}.txt'.format(now.day, now.month, now.year), 'a') as f:
+            print(msg, file=f)

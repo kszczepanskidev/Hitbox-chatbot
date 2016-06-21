@@ -19,16 +19,18 @@ class ChatBot:
     current_song_name = ''
     previous_song_name = ''
 
+    repeatable_message = 'Aby wysłać anonimową wiadomość do Hanty szepnij do mnie ;)'
+
     hitbox_api = None
     gui = None
 
     logo = """
      _   _             _       ______       _   
-    | | | |           | |      | ___ \     | |  
+    | | | |           | |      | ___ \     | |  \tv0.2 alpha by {}
     | |_| |_   _ _ __ | |_ __ _| |_/ / ___ | |_ 
-    |  _  | | | | '_ \| __/ _` | ___ \/ _ \| __|
-    | | | | |_| | | | | || (_| | |_/ / (_) | |_ 
-    \_| |_/\__,_|_| |_|\__\__,_\____/ \___/ \__|\tv0.2 alpha by {}\n""".format(__author__)
+    |  _  | | | | '_ \| __/ _` | ___ \/ _ \| __|\tChannel:  {}
+    | | | | |_| | | | | || (_| | |_/ / (_) | |_ \tUsername: {}
+    \_| |_/\__,_|_| |_|\__\__,_\____/ \___/ \__|\n"""
 
 
     def __init__(self):
@@ -45,9 +47,10 @@ class ChatBot:
         os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
         os.system('cls' if os.name == 'nt' else 'clear')
 
-        print(self.logo)
+        print(self.logo.format(__author__, self.channel_name, self.login))
         _thread.start_new_thread(dubtrack_api.save_dubtrack_name_to_file, (self,))
         _thread.start_new_thread(self.hitbox_api.hitbox_chat_receiver, ())
+        self.hitbox_api.message_repeater()
 
 
     def save_settings_to_file(self):
@@ -74,7 +77,6 @@ if __name__ == '__main__':
     bot = ChatBot()
 
     try:
-        bot.config()
         while True:
             pass
     except:

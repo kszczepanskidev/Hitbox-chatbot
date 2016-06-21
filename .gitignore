@@ -1,3 +1,9 @@
+#Project specific
+*.data
+*.txt
+.idea
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
@@ -60,7 +66,3 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
-
-settings.data
-dubtracksong.txt
-.idea
