@@ -63,5 +63,4 @@ target/
 
 settings.data
 dubtracksong.txt
-chat_song.py
-dubtrack.py
+.idea

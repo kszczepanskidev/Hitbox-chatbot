@@ -3,7 +3,6 @@ import os
 import getpass
 import time
 
-import main
 import dubtrack_api
 import hitbox_api
 
@@ -37,18 +36,15 @@ class ChatBot:
             self.load_settings_from_file()
             self.config()
         else:
-            # self.prompt_user_settings()
-            self.gui_login()
+            self.prompt_user_settings()
 
     def config(self):
         self.hitbox_api = hitbox_api.HitboxAPI(self)
-        time.sleep(5)
+        time.sleep(3)
 
         os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
         os.system('cls' if os.name == 'nt' else 'clear')
-        self.start()
 
-    def start(self):
         print(self.logo)
         _thread.start_new_thread(dubtrack_api.save_dubtrack_name_to_file, (self,))
         _thread.start_new_thread(self.hitbox_api.hitbox_chat_receiver, ())
@@ -73,19 +69,14 @@ class ChatBot:
         self.channel_name = input('Channel: ')
         self.save_settings_to_file()
 
-    def gui_login(self):
-        self.gui = main.GUI_Settings()
-        self.gui.init(self)
-        self.gui.run()
-
 
 if __name__ == '__main__':
     bot = ChatBot()
 
     try:
-        # bot.start()
+        bot.config()
         while True:
             pass
     except:
-        # os.system('cls' if os.name == 'nt' else 'clear')
+        os.system('cls' if os.name == 'nt' else 'clear')
         quit()
