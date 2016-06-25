@@ -1,5 +1,6 @@
 import re
 
+
 def clear_song_name(song):
     song = song.replace('&apos;', '\'')
     song = song.replace('&amp;', '&')
@@ -38,7 +39,6 @@ def clear_song_name(song):
     song = re.sub(r'(?i)[\\s]*[\[(][\\s]*music video[\\s]*[\])]', '', song)
     song = re.sub(r'(?i)[\\s]*[\[(][\\s]*[a-z\\s]*live[a-z\\s]*[\\s]*[\])]', '', song)
     song = re.sub(r'(?i)[\\s]*M/V', '', song)
-
 
     song = re.sub(r'(?i)[\\s]*[\[(][\\s]*hd 720p[\\s]*[\])][\\s]*', ' ', song)
     song = re.sub(r'(?i)[\\s]*[\[(][\\s]*hd[\\s]*[\])][\\s]*', ' ', song)

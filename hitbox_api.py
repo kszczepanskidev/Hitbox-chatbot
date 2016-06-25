@@ -110,7 +110,7 @@ class HitboxAPI:
 
     def handle_direct_message(self, msg):
         message_text = msg['text']
-        user_name = msg['from']
+        # user_name = msg['from']
         channel = msg['channel']
 
         self.chat_message('@{} {}'.format(channel, message_text))
@@ -119,7 +119,8 @@ class HitboxAPI:
         threading.Timer(120, self.message_repeater).start()
         self.chat_message(self.chat_bot.repeatable_message)
 
-    def log_messages(self, msg):
+    @staticmethod
+    def log_messages(msg):
         now = datetime.now()
         with open('log_{}_{}_{}.txt'.format(now.day, now.month, now.year), 'a') as f:
             print(msg, file=f)

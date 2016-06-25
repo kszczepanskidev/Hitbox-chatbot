@@ -20,7 +20,9 @@ class ChatBot:
     current_song_name = ''
     previous_song_name = ''
 
-    repeatable_message = 'Aby wysłać anonimową wiadomość do Hanty szepnij do mnie ;)'
+    do_whisper = None
+    do_repeat = None
+    repeatable_message = open('repeat_msg.data', 'r').readline().replace('\n', '')
 
     commands = {}
     all_commands = []
@@ -43,7 +45,7 @@ class ChatBot:
             self.prompt_user_settings()
 
         self.commands = command.load_commands()
-        self.all_commands = list(self.commands.keys())
+        self.all_commands = list(self.commands.keys()).remove('komendy')
 
         self.hitbox_api = hitbox_api.HitboxAPI(self)
         time.sleep(3)
@@ -52,26 +54,36 @@ class ChatBot:
         os.system('cls' if os.name == 'nt' else 'clear')
 
         print(self.logo.format(__author__, self.channel_name, self.login))
+
         _thread.start_new_thread(dubtrack_api.save_dubtrack_name_to_file, (self,))
         _thread.start_new_thread(self.hitbox_api.hitbox_chat_receiver, ())
-        self.hitbox_api.message_repeater()
+
+        if self.do_repeat:
+            self.hitbox_api.message_repeater()
 
     def save_settings_to_file(self):
         with open('settings.data', 'w') as f:
-            print(self.login, file=f)
-            print(self.password, file=f)
-            print(self.channel_name, file=f)
+            print('login:' + self.login, file=f)
+            print('password:' + self.password, file=f)
+            print('channel:' + self.channel_name, file=f)
+            print('repeat:' + self.channel_name, file=f)
+            print('whisper:' + self.channel_name, file=f)
 
     def load_settings_from_file(self):
         with open('settings.data', 'r') as f:
-            self.login = f.readline().replace('\n', '')
-            self.password = f.readline().replace('\n', '')
-            self.channel_name = f.readline().replace('\n', '')
+            self.login = f.readline().replace('\n', '').split(':')[1]
+            self.password = f.readline().replace('\n', '').split(':')[1]
+            self.channel_name = f.readline().replace('\n', '').split(':')[1]
+            self.do_repeat = f.readline().replace('\n', '').split(':')[1] == 'true'
+            self.do_whisper = f.readline().replace('\n', '').split(':')[1] == 'true'
 
     def prompt_user_settings(self):
         self.login = input('Login: ')
         self.password = getpass.getpass('Password: ')
         self.channel_name = input('Channel: ')
+        print('Current msg for repeating: {} (Can change in repeat_msg.data)'.format(self.repeatable_message))
+        self.do_repeat = input('Enable repeating message every 2 minutes? (Y|N): ').upper() == 'Y'
+        self.do_whisper = input('Enable anonymous whispering? (Y|N: ').upper() == 'Y'
         self.save_settings_to_file()
 
 
