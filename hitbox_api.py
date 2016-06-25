@@ -85,14 +85,28 @@ class HitboxAPI:
         if message_text[0] == '!':
             self.handle_chat_command(message_text[1:], user_name, is_subscriber)
 
-    def handle_chat_command(self, msg, user, sub):
-        if msg == 'dubtrack':
-            if self.chat_bot.current_song_name != '':
-                self.chat_message('@{} teraz gra {}'.format(user, self.chat_bot.current_song_name))
-            else:
-                self.chat_message('@{} aktualnie na dubtracku nie leci żadna piosenka.'.format(user))
-        elif msg == 'komendy':
-            self.chat_message('Aktualnie dostępne komendy: dubtrack')
+    def handle_chat_command(self, msg, username, sub):
+        try:
+            command = self.chat_bot.commands[msg]
+        except:
+            return
+
+        if command.subonly and not sub:
+            return
+
+        temp = []
+        print(eval('self.chat_bot.all_commands'))
+        for p in command.parameters:
+            try:
+                temp.append(eval(p))
+            except:
+                try:
+                    temp.append(eval('self.' + p))
+                except:
+                    temp.append(eval('self.chat_bot.' + p))
+        command.parameters = temp
+
+        self.chat_message(command.message.format(*command.parameters))
 
     def handle_direct_message(self, msg):
         message_text = msg['text']
