@@ -2,6 +2,7 @@ import requests
 import json
 import random
 import threading
+import re
 from datetime import datetime
 from websocket import create_connection
 
@@ -14,6 +15,8 @@ class HitboxAPI:
 
     chat_bot = None
     websocket = None
+
+    regex_url = re.compile(r'(?i)(http|ftp|https)?(:\/\/)?([\w_-]+(?:(?:\.[\w_-]+)+))([\w.,@?^=%&:\/~+#-]*[\w@?^=%&\/~+#-])?')
 
     def __init__(self, chatbot):
         self.chat_bot = chatbot
@@ -81,6 +84,8 @@ class HitboxAPI:
         if user_name == 'HuntaBot':
             return
 
+        self.check_timeout(message_text, user_name)
+
         print('[CHAT]{}: {}'.format(user_name, message_text))
         if message_text[0] == '!':
             self.handle_chat_command(message_text[1:], user_name, is_subscriber)
@@ -95,7 +100,6 @@ class HitboxAPI:
             return
 
         temp = []
-        print(eval('self.chat_bot.all_commands'))
         for p in command.parameters:
             try:
                 temp.append(eval(p))
@@ -118,6 +122,16 @@ class HitboxAPI:
     def message_repeater(self):
         threading.Timer(120, self.message_repeater).start()
         self.chat_message(self.chat_bot.repeatable_message)
+
+    def check_timeout(self, msg, user):
+        if self.regex_url.search(msg) or \
+                (sum(1 for c in msg if c.isupper()) / len(msg.strip().replace(' ', ''))) >= 0.5:
+            self.timeout_user(user)
+
+    def timeout_user(self, user):
+        self.websocket.send('5:::{{"name":"message","args":[{{"method":"kickUser",'
+                            '"params":{{"channel":"{}","name":"{}","token":"{}","timeout":"30"}}}}]}}'.
+                            format(self.chat_bot.channel_name, user, self.user_token))
 
     @staticmethod
     def log_messages(msg):

@@ -11,7 +11,7 @@ class Command:
 
 def load_commands():
     commands = {}
-    with open('commands.data', 'r') as f:
+    with open('commands.data', 'r', encoding='iso-8859-2') as f:
         for line in f:
             if line[0] != '#':
                 line = line.split('|')

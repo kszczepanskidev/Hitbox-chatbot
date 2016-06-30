@@ -22,7 +22,7 @@ class ChatBot:
 
     do_whisper = None
     do_repeat = None
-    repeatable_message = open('repeat_msg.data', 'r').readline().replace('\n', '')
+    repeatable_message = open('repeat_msg.data', 'r', encoding='iso-8859-2').readline().replace('\n', '')
 
     commands = {}
     all_commands = []
@@ -45,9 +45,11 @@ class ChatBot:
             self.prompt_user_settings()
 
         self.commands = command.load_commands()
-        self.all_commands = list(self.commands.keys()).remove('komendy')
+        self.all_commands = ', '.join(list(self.commands.keys()))
 
+        print('Connecting to Hitbox...')
         self.hitbox_api = hitbox_api.HitboxAPI(self)
+        print('Connected')
         time.sleep(3)
 
         os.environ["REQUESTS_CA_BUNDLE"] = 'cacert.pem'
