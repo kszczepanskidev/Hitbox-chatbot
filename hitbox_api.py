@@ -3,6 +3,7 @@ import json
 import random
 import threading
 import re
+import time
 from datetime import datetime
 from websocket import create_connection
 
@@ -53,8 +54,7 @@ class HitboxAPI:
             self.chat_bot.previous_song_name = ''
 
     def hitbox_chat_receiver(self):
-        # self.chat_message('Avoiding hitbox spam security {}'.format(random.randint(0, 100)))
-        self.chat_message('Huntwieczór wszystkim! :D /')
+        # self.chat_message('Huntwieczór wszystkim! :D /')
         while True:
             self.handle_message(self.websocket.recv())
 
@@ -64,10 +64,13 @@ class HitboxAPI:
         elif message[0] == '2':
             self.websocket.send(message)
         else:
-            self.log_messages(message)
-            message = message[4:].replace('["', '[').replace('"]', ']').replace('\\"', '\"')
-            message = json.loads(message)
-            message_type = message['args'][0]['method']
+            try:
+                self.log_messages(message)
+                message = message[4:].replace('["', '[').replace('"]', ']').replace('\\"', '\"')
+                message = json.loads(message)
+                message_type = message['args'][0]['method']
+            except:
+                return
 
             if 'buffer' in message['args'][0]['params']:
                 return
@@ -75,6 +78,8 @@ class HitboxAPI:
                 self.handle_user_message(message['args'][0]['params'])
             elif message_type == 'directMsg':
                 self.handle_direct_message(message['args'][0]['params'])
+            elif message_type == 'chatLog':
+                self.handle_chat_log(message['args'][0]['params']['text'])
 
     def handle_user_message(self, msg):
         message_text = msg['text']
@@ -84,9 +89,12 @@ class HitboxAPI:
         if user_name == 'HuntaBot':
             return
 
-        self.check_timeout(message_text, user_name)
+        if msg['role'] == 'anon' and self.check_timeout(message_text, user_name):
+            print('[TIME]{}: {}'.format(user_name, message_text))
+            return
 
         print('[CHAT]{}: {}'.format(user_name, message_text))
+
         if message_text[0] == '!':
             self.handle_chat_command(message_text[1:], user_name, is_subscriber)
 
@@ -119,22 +127,57 @@ class HitboxAPI:
 
         self.chat_message('@{} {}'.format(channel, message_text))
 
+    def handle_chat_log(self, msg):
+        if 'subscribed' in msg:
+            username = msg[msg.index('>') + 1:msg[msg.index('>') + 1:].index('>')]
+
+            self.chat_message(':metal: SUB HYPE :metal: Witamy nowego suba @{} :metal:'.format(username))
+
+
     def message_repeater(self):
         threading.Timer(120, self.message_repeater).start()
         self.chat_message(self.chat_bot.repeatable_message)
 
     def check_timeout(self, msg, user):
-        if self.regex_url.search(msg) or \
-                (sum(1 for c in msg if c.isupper()) / len(msg.strip().replace(' ', ''))) >= 0.5:
-            self.timeout_user(user)
+        if self.check_timeout_huntaedition(msg, user):
+            return True
 
-    def timeout_user(self, user):
+        if self.regex_url.search(msg):
+            self.timeout_user(user, 60)
+            self.chat_message('Proszę o nie wrzucanie linków na chat @{} [60s]'.format(user))
+            return True
+
+        if (sum(1 for c in msg if c.isupper()) / len(msg.strip().replace(' ', ''))) > 0.65 and len(msg.strip().replace(' ', '')) > 5:
+            self.timeout_user(user, 30)
+            self.chat_message('Proszę o nie pisanie CAPSEM @{} [30s]'.format(user))
+            return True
+
+        return False
+
+    def check_timeout_huntaedition(self, msg, user):
+        if user == 'Venans' and (msg[-1] == '.' or 'venans' in msg.lower()):
+            self.timeout_user(user, 10)
+            # self.chat_message('Anti-Venans Script Activated [10s]'.format(user))
+            return True
+
+        if user in ['SzaroBuryPies', 'Venans'] and any(x in msg.lower().replace('.', '') for x in ['szafa', 'szafeczka', 'szafunia']):
+            self.timeout_user(user, 10)
+            # self.chat_message('Anti-Szafa Script Activated [10s]'.format(user))
+            return True
+
+        return False
+
+
+    def timeout_user(self, user, time=30):
         self.websocket.send('5:::{{"name":"message","args":[{{"method":"kickUser",'
-                            '"params":{{"channel":"{}","name":"{}","token":"{}","timeout":"30"}}}}]}}'.
-                            format(self.chat_bot.channel_name, user, self.user_token))
+                            '"params":{{"channel":"{}","name":"{}","token":"{}","timeout":"{}"}}}}]}}'.
+                            format(self.chat_bot.channel_name, user, self.user_token, time))
 
     @staticmethod
     def log_messages(msg):
         now = datetime.now()
-        with open('log_{}_{}_{}.txt'.format(now.day, now.month, now.year), 'a') as f:
-            print(msg, file=f)
+        try:
+            with open('log_{}_{}_{}.txt'.format(now.day, now.month, now.year), 'a') as f:
+                print(msg, file=f)
+        except:
+            return

@@ -60,8 +60,8 @@ class ChatBot:
         _thread.start_new_thread(dubtrack_api.save_dubtrack_name_to_file, (self,))
         _thread.start_new_thread(self.hitbox_api.hitbox_chat_receiver, ())
 
-        if self.do_repeat:
-            self.hitbox_api.message_repeater()
+        # if self.do_repeat:
+        #     self.hitbox_api.message_repeater()
 
     def save_settings_to_file(self):
         with open('settings.data', 'w') as f:
