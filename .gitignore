@@ -66,3 +66,15 @@ target/
 
 #Ipython Notebook
 .ipynb_checkpoints
+
+
+#Django specific
+*~
+*.orig
+*.rej
+__minitage__*
+bin/*
+log
+media/uploads
+tmp
+.DS_Store

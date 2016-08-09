@@ -86,7 +86,7 @@ class HitboxAPI:
         user_name = msg['name']
         is_subscriber = msg['isSubscriber']
 
-        if user_name == 'HuntaBot':
+        if user_name == 'HuntaBot_Script':
             return
 
         if msg['role'] == 'anon' and self.check_timeout(message_text, user_name):

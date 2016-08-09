@@ -1,9 +1,10 @@
-from requests import get
+import codecs
 import json
 import time
-import codecs
 
-from clear_song_name import clear_song_name
+from requests import get
+
+from HuntaBot_Script.clear_song_name import clear_song_name
 
 
 def get_current_song_name():

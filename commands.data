@@ -1,9 +1,0 @@
-# Command name|Message|Parameters for {} in message|Is sub only?
-#
-# Available parameters:
-# all_commands - list of all commands
-# username - name of user that called command
-# current_song_name - current song on dubtrack
-#
-komendy|Aktualnie dostêpne komendy: {}|all_commands|false
-dubtrack|@{} teraz gra {}|username current_song_name|false
