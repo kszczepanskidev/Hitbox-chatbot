@@ -4,7 +4,7 @@ import time
 
 from requests import get
 
-from HuntaBot_Script.clear_song_name import clear_song_name
+from clear_song_name import clear_song_name
 
 
 def get_current_song_name():

@@ -3,10 +3,10 @@ import getpass
 import os
 import time
 
-from HuntaBot_Script import command
-from HuntaBot_Script import dubtrack_api
+import command
+import dubtrack_api
 
-from HuntaBot_Script import hitbox_api
+import hitbox_api
 
 __author__ = 'Krysztal'
 
