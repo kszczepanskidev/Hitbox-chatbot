@@ -6,4 +6,4 @@
 # current_song_name - current song on dubtrack
 #
 komendy|Aktualnie dostêpne komendy: {}|all_commands|false
-dubtrack|@{} teraz gra {}|username current_song_name|false
+muzyka|@{} teraz gra {}|username current_song_name|false

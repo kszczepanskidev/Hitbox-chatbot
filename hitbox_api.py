@@ -3,7 +3,7 @@ import json
 import random
 import threading
 import re
-import time
+
 from datetime import datetime
 from websocket import create_connection
 
@@ -54,7 +54,7 @@ class HitboxAPI:
             self.chat_bot.previous_song_name = ''
 
     def hitbox_chat_receiver(self):
-        # self.chat_message('Huntwieczór wszystkim! :D /')
+        self.chat_message('Huntwieczór wszystkim huntKasa /')
         while True:
             self.handle_message(self.websocket.recv())
 
@@ -99,6 +99,9 @@ class HitboxAPI:
             self.handle_chat_command(message_text[1:], user_name, is_subscriber)
 
     def handle_chat_command(self, msg, username, sub):
+        if msg not in self.chat_bot.commands:
+            msg = 'komendy'
+
         try:
             command = self.chat_bot.commands[msg]
         except:
@@ -117,6 +120,9 @@ class HitboxAPI:
                 except:
                     temp.append(eval('self.chat_bot.' + p))
         command.parameters = temp
+
+        if command.message == '@{} teraz gra {}' and temp[1] == '':
+            command.message = '@{} aktualnie nic nie gra'
 
         self.chat_message(command.message.format(*command.parameters))
 
