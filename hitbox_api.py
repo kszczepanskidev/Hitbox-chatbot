@@ -95,8 +95,8 @@ class HitboxAPI:
 
         print('[CHAT]{}: {}'.format(user_name, message_text))
 
-        if message_text[0] == '!':
-            self.handle_chat_command(message_text[1:], user_name, is_subscriber)
+        # if message_text[0] == '!':
+        #     self.handle_chat_command(message_text[1:], user_name, is_subscriber)
 
     def handle_chat_command(self, msg, username, sub):
         if msg not in self.chat_bot.commands:
@@ -137,7 +137,7 @@ class HitboxAPI:
         if 'subscribed' in msg:
             username = msg[msg.index('>') + 1:msg[msg.index('>') + 1:].index('>')]
 
-            self.chat_message(':metal: SUB HYPE :metal: Witamy nowego suba @{} :metal:'.format(username))
+            self.chat_message(':metal: SUB HYPE :metal: Witamy nowego suba @{} dajSuba'.format(username))
 
 
     def message_repeater(self):
@@ -145,17 +145,17 @@ class HitboxAPI:
         self.chat_message(self.chat_bot.repeatable_message)
 
     def check_timeout(self, msg, user):
-        if self.check_timeout_huntaedition(msg, user):
-            return True
+        # if self.check_timeout_huntaedition(msg, user):
+        #     return True
 
-        if self.regex_url.search(msg):
-            self.timeout_user(user, 60)
-            self.chat_message('Proszę o nie wrzucanie linków na chat @{} [60s]'.format(user))
-            return True
+        # if self.regex_url.search(msg):
+        #     self.timeout_user(user, 60)
+        #     self.chat_message('Proszę o nie wrzucanie linków na chat @{} [60s]'.format(user))
+        #     return True
 
         if (sum(1 for c in msg if c.isupper()) / len(msg.strip().replace(' ', ''))) > 0.65 and len(msg.strip().replace(' ', '')) > 5:
-            self.timeout_user(user, 30)
-            self.chat_message('Proszę o nie pisanie CAPSEM @{} [30s]'.format(user))
+            self.timeout_user(user, 60)
+            self.chat_message('Proszę o nie pisanie CAPSEM @{} [60s]'.format(user))
             return True
 
         return False

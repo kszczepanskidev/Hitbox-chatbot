@@ -48,8 +48,8 @@ class ChatBot:
         else:
             self.prompt_user_settings()
 
-        self.commands = command.load_commands()
-        self.all_commands = ', '.join(list(self.commands.keys()))
+        # self.commands = command.load_commands()
+        # self.all_commands = ', '.join(list(self.commands.keys()))
 
         print('Connecting to Hitbox...')
         self.hitbox_api = hitbox_api.HitboxAPI(self)
